@@ -17,6 +17,25 @@ const env = envSchema.parse(process.env);
 
 const DEEPL_API_KEY = env.DEEPL_API_KEY;
 
+const translateText = async (text) => {
+  try {
+    const response = await axios.post('https://api-free.deepl.com/v2/translate', {
+      text: [text], // Ensure text is an array of strings
+      target_lang: 'FR'
+    }, {
+      headers: {
+        'Authorization': `DeepL-Auth-Key ${DEEPL_API_KEY}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    return response.data.translations[0].text;
+  } catch (error) {
+    console.error('Error translating the text:', error);
+    return null;
+  }
+};
+
 const askWord = () => {
   inquirer.prompt([
     {
@@ -26,57 +45,47 @@ const askWord = () => {
     }
   ]).then(async answers => {
     if (answers.englishWord.toLowerCase() !== '\\q') {
-      try {
-        // Translate the word using DeepL API
-        const response = await axios.post('https://api-free.deepl.com/v2/translate', {
-          text: [answers.englishWord],
-          target_lang: 'FR'
-        }, {
-          headers: {
-            'Authorization': `DeepL-Auth-Key ${DEEPL_API_KEY}`,
-            'Content-Type': 'application/json'
-          }
-        });
+      const wordTranslation = await translateText(answers.englishWord);
+      console.log(`Translation: ${wordTranslation}`);
 
-        const translation = response.data.translations[0].text;
-        console.log(`Translation: ${translation}`);
+      inquirer.prompt([
+        {
+          type: 'input',
+          name: 'discoveredSentence',
+          message: 'Sentence where the word was discovered:',
+        },
+        {
+          type: 'input',
+          name: 'inventedSentence',
+          message: 'Invent a sentence with this word:',
+        }
+      ]).then(async answers2 => {
+        const discoveredSentenceTranslation = await translateText(answers2.discoveredSentence);
+        const inventedSentenceTranslation = await translateText(answers2.inventedSentence);
 
-        inquirer.prompt([
-          {
-            type: 'input',
-            name: 'discoveredSentence',
-            message: 'Sentence where the word was discovered:',
-          },
-          {
-            type: 'input',
-            name: 'inventedSentence',
-            message: 'Invent a sentence with this word:',
-          }
-        ]).then(answers2 => {
-          const data = {
-            word: answers.englishWord,
-            translation: translation,
-            discoveredSentence: answers2.discoveredSentence,
-            inventedSentence: answers2.inventedSentence
-          };
+        const data = {
+          word: answers.englishWord,
+          translation: wordTranslation,
+          discoveredSentence: answers2.discoveredSentence,
+          discoveredSentenceTranslation: discoveredSentenceTranslation,
+          inventedSentence: answers2.inventedSentence,
+          inventedSentenceTranslation: inventedSentenceTranslation
+        };
 
-          // Append the data to a JSON file
-          fs.readFile('words.json', (err, fileData) => {
-            if (err && err.code !== 'ENOENT') throw err;
+        // Append the data to a JSON file
+        fs.readFile('words.json', (err, fileData) => {
+          if (err && err.code !== 'ENOENT') throw err;
 
-            const json = fileData ? JSON.parse(fileData) : [];
-            json.push(data);
+          const json = fileData ? JSON.parse(fileData) : [];
+          json.push(data);
 
-            fs.writeFile('words.json', JSON.stringify(json, null, 2), (err) => {
-              if (err) throw err;
-              console.log('Data saved to words.json');
-              askWord(); // Call the function again to ask another question
-            });
+          fs.writeFile('words.json', JSON.stringify(json, null, 2), (err) => {
+            if (err) throw err;
+            console.log('Data saved to words.json');
+            askWord(); // Call the function again to ask another question
           });
         });
-      } catch (error) {
-        console.error('Error translating the word:', error);
-      }
+      });
     } else {
       console.log('Goodbye!');
       // Close the file properly
