@@ -6,5 +6,13 @@
     "discoveredSentenceTranslation": "Parlez à n'importe qui, évitez les maladresses.",
     "inventedSentence": "Awkwardness moments can also be quite funny!",
     "inventedSentenceTranslation": "Les moments de gêne peuvent aussi être très drôles !"
+  },
+  {
+    "word": "Hello",
+    "translation": "Bonjour",
+    "discoveredSentence": "Hello World!",
+    "discoveredSentenceTranslation": "Bonjour le monde !",
+    "inventedSentence": "Hello John.",
+    "inventedSentenceTranslation": "Bonjour John."
   }
 ]
