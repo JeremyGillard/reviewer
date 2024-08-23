@@ -1,0 +1,16 @@
+{
+  "name": "reviewer",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.mjs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "deepl-node": "^1.13.1"
+  }
+}
