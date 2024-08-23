@@ -27,7 +27,7 @@ const addWord = async () => {
       discoveredSentenceTranslation: discoveredSentenceTranslation,
       inventedSentence: answers2.inventedSentence,
       inventedSentenceTranslation: inventedSentenceTranslation,
-      index: 0,
+      index: 4,
       creationDate: new Date().toISOString(),
       reviewedDate: new Date().toISOString()
     };
