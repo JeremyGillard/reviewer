@@ -1,4 +1,5 @@
 import axios from 'axios';
+import chalk from 'chalk';
 import dotenv from 'dotenv';
 import fs from 'fs';
 import inquirer from 'inquirer';
@@ -126,35 +127,38 @@ const reviewWords = () => {
             } else if (answers.translation.toLowerCase() === '\\a') {
               addWord();
             } else if (answers.translation.toLowerCase() === word.word.toLowerCase()) {
-              console.log('✅ Correct!');
+              console.log(chalk.green('✅ Correct!'));
               index++;
               reviewNextWord();
             } else {
-              console.log(`💭 Incorrect. The correct translation is: ${word.word}`);
+              console.log(chalk.blue(`💭 Incorrect. The correct translation is: `), word.word);
               inquirer.prompt([
                 {
                   type: 'input',
                   name: 'discoveredSentenceTranslation',
                   message: `Translate this sentence to English: ${word.discoveredSentenceTranslation}`,
-                },
-                {
-                  type: 'input',
-                  name: 'inventedSentenceTranslation',
-                  message: `Translate this sentence to English: ${word.inventedSentenceTranslation}`,
                 }
               ]).then(answers2 => {
                 if (answers2.discoveredSentenceTranslation.toLowerCase() === word.discoveredSentence.toLowerCase()) {
-                  console.log('✅ Correct!');
+                  console.log(chalk.green('✅ Correct!'));
                 } else {
-                  console.log(`💭 Incorrect. The correct translation is: ${word.discoveredSentence}`);
+                  console.log(chalk.blue(`💭 Incorrect. The correct translation is: `), word.discoveredSentence);
                 }
-                if (answers2.inventedSentenceTranslation.toLowerCase() === word.inventedSentence.toLowerCase()) {
-                  console.log('✅ Correct!');
-                } else {
-                  console.log(`💭 Incorrect. The correct translation is: ${word.inventedSentence}`);
-                }
-                index++;
-                reviewNextWord();
+                inquirer.prompt([
+                  {
+                    type: 'input',
+                    name: 'inventedSentenceTranslation',
+                    message: `Translate this sentence to English: ${word.inventedSentenceTranslation}`,
+                  }
+                ]).then(answers3 => {
+                  if (answers3.inventedSentenceTranslation.toLowerCase() === word.inventedSentence.toLowerCase()) {
+                    console.log(chalk.green('✅ Correct!'));
+                  } else {
+                    console.log(chalk.blue(`💭 Incorrect. The correct translation is: `), word.inventedSentence);
+                  }
+                  index++;
+                  reviewNextWord();
+                });
               });
             }
           });
