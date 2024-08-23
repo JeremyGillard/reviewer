@@ -1,68 +1,11 @@
 [
   {
-    "word": "Awkwardness",
-    "translation": "La maladresse",
-    "discoveredSentence": "Talk to anyone, avoid awkwardness.",
-    "discoveredSentenceTranslation": "Parlez à n'importe qui, évitez les maladresses.",
-    "inventedSentence": "Awkwardness can be quite funny sometimes.",
-    "inventedSentenceTranslation": "La maladresse peut parfois être très drôle.",
-    "index": 1,
-    "creationDate": "2024-08-23T09:43:06.413Z",
-    "reviewedDate": "2024-08-23T09:43:50.201Z"
-  },
-  {
-    "word": "stave off",
-    "translation": "éviter",
-    "discoveredSentence": "staving off depression",
-    "discoveredSentenceTranslation": "lutter contre la dépression",
-    "inventedSentence": "The country is taking measures to stave off poverty.",
-    "inventedSentenceTranslation": "Le pays prend des mesures pour lutter contre la pauvreté.",
-    "index": 3,
-    "creationDate": "2024-08-23T10:07:18.889Z",
-    "reviewedDate": "2024-08-23T10:19:50.815Z"
-  },
-  {
-    "word": "is akin to",
-    "translation": "s'apparente à",
-    "discoveredSentence": "Various studies have shown that the effects of loneliness are akin to eating a poorer diet and exercising less.",
-    "discoveredSentenceTranslation": "Diverses études ont montré que les effets de la solitude sont comparables à ceux d'une mauvaise alimentation et d'une baisse de l'activité physique.",
-    "inventedSentence": "This uprising is akin to a revolution.",
-    "inventedSentenceTranslation": "Ce soulèvement s'apparente à une révolution.",
-    "index": 3,
-    "creationDate": "2024-08-23T10:09:43.322Z",
-    "reviewedDate": "2024-08-23T10:17:26.576Z"
-  },
-  {
-    "word": "thrive",
-    "translation": "prospérer",
-    "discoveredSentence": "It might sound a little melodramatic, but companionship is literally the way our brains have been built to survive and thrive.",
-    "discoveredSentenceTranslation": "Cela peut sembler un peu mélodramatique, mais la compagnie est littéralement la façon dont notre cerveau a été construit pour survivre et s'épanouir.",
-    "inventedSentence": "This king will thrive.",
-    "inventedSentenceTranslation": "Ce roi va prospérer.",
-    "index": 3,
-    "creationDate": "2024-08-23T10:12:09.122Z",
-    "reviewedDate": "2024-08-23T10:19:57.268Z"
-  },
-  {
-    "word": "a wrinkle",
-    "translation": "une ride",
-    "discoveredSentence": "There's an even more important wrinkle.",
-    "discoveredSentenceTranslation": "Il y a un problème encore plus important.",
-    "inventedSentence": "People are afraid of their wrinkles because it's a sign of old age.",
-    "inventedSentenceTranslation": "Les gens ont peur de leurs rides parce que c'est un signe de vieillesse.",
-    "index": 3,
-    "creationDate": "2024-08-23T10:14:05.317Z",
-    "reviewedDate": "2024-08-23T10:18:17.837Z"
-  },
-  {
-    "word": "despise",
-    "translation": "méprise",
-    "discoveredSentence": "Sounds like even our brains despise small talk.",
-    "discoveredSentenceTranslation": "On dirait que même nos cerveaux méprisent les petites conversations.",
-    "inventedSentence": "The despise is behavior that I don't approve of.",
-    "inventedSentenceTranslation": "Le mépris est un comportement que je n'approuve pas.",
-    "index": 3,
-    "creationDate": "2024-08-23T10:16:04.904Z",
-    "reviewedDate": "2024-08-23T10:20:16.808Z"
+    "sentence": "talk to anyone, avoid awkwardness",
+    "sentenceTranslation": "parler à n'importe qui, éviter les maladresses",
+    "word": "awkwardness",
+    "wordTranslation": "maladresse",
+    "index": -1,
+    "creationDate": "2024-08-23T11:11:10.503Z",
+    "reviewedDate": "2024-08-23T11:12:14.177Z"
   }
 ]

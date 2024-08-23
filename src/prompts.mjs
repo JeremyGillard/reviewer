@@ -1,27 +1,22 @@
 import chalk from 'chalk';
 import inquirer from 'inquirer';
 
-export const promptNewWord = () => {
+export const promptNewSentence = () => {
   return inquirer.prompt([
     {
       type: 'input',
-      name: 'englishWord',
-      message: 'New word (or type \\q to quit, \\r to review):',
+      name: 'sentence',
+      message: 'Enter the sentence context (or type \\q to quit, \\r to review):',
     }
   ]);
 };
 
-export const promptSentences = () => {
+export const promptWord = () => {
   return inquirer.prompt([
     {
       type: 'input',
-      name: 'discoveredSentence',
-      message: 'Sentence where the word was discovered:',
-    },
-    {
-      type: 'input',
-      name: 'inventedSentence',
-      message: 'Invent a sentence with this word:',
+      name: 'word',
+      message: 'Enter the word you don\'t understand:',
     }
   ]);
 };

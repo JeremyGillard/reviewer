@@ -1,33 +1,31 @@
 #!/usr/bin/env node
 
 import chalk from 'chalk';
-import { readJson, writeJson } from './file.mjs';
-import { promptNewWord, promptSentences, promptSentenceTranslation, promptTranslation } from './prompts.mjs';
+import { readJson, writeJson } from './fileHandler.mjs';
+import { promptNewSentence, promptSentenceTranslation, promptTranslation, promptWord } from './prompts.mjs';
 import { translateText } from './translator.mjs';
 
-const addWord = async () => {
-  const answers = await promptNewWord();
+const addSentence = async () => {
+  const sentenceAnswer = await promptNewSentence();
 
-  if (answers.englishWord.toLowerCase() === '\\q') {
+  if (sentenceAnswer.sentence.toLowerCase() === '\\q') {
     console.log('Goodbye!');
-  } else if (answers.englishWord.toLowerCase() === '\\r') {
+  } else if (sentenceAnswer.sentence.toLowerCase() === '\\r') {
     await reviewWords();
   } else {
-    const wordTranslation = await translateText(answers.englishWord);
-    console.log(`Translation: ${chalk.yellow(wordTranslation)}`);
+    const sentenceTranslation = await translateText(sentenceAnswer.sentence);
+    console.log(`Sentence Translation: ${chalk.yellow(sentenceTranslation)}`);
 
-    const answers2 = await promptSentences();
-    const discoveredSentenceTranslation = await translateText(answers2.discoveredSentence);
-    const inventedSentenceTranslation = await translateText(answers2.inventedSentence);
+    const wordAnswer = await promptWord();
+    const wordTranslation = await translateText(wordAnswer.word);
+    console.log(`Word Translation: ${chalk.yellow(wordTranslation)}`);
 
     const data = {
-      word: answers.englishWord,
-      translation: wordTranslation,
-      discoveredSentence: answers2.discoveredSentence,
-      discoveredSentenceTranslation: discoveredSentenceTranslation,
-      inventedSentence: answers2.inventedSentence,
-      inventedSentenceTranslation: inventedSentenceTranslation,
-      index: 4,
+      sentence: sentenceAnswer.sentence,
+      sentenceTranslation: sentenceTranslation,
+      word: wordAnswer.word,
+      wordTranslation: wordTranslation,
+      index: 0,
       creationDate: new Date().toISOString(),
       reviewedDate: new Date().toISOString()
     };
@@ -38,7 +36,7 @@ const addWord = async () => {
 
     await writeJson(json);
     console.log('Data saved to words.json');
-    addWord(); // Call the function again to ask another question
+    addSentence(); // Call the function again to ask another question
   }
 };
 
@@ -46,7 +44,7 @@ const reviewWords = async () => {
   const fileData = await readJson();
   if (!fileData) {
     console.log('No words to review.');
-    await addWord();
+    await addSentence();
   } else {
     const oneMonthAgo = new Date();
     oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
@@ -60,41 +58,33 @@ const reviewWords = async () => {
     const reviewNextWord = async () => {
       if (index < words.length) {
         const word = words[index];
-        const answers = await promptTranslation(word.translation);
+        const answers = await promptSentenceTranslation(word.sentenceTranslation);
 
-        if (answers.translation.toLowerCase() === '\\q') {
+        if (answers.sentenceTranslation.toLowerCase() === '\\q') {
           console.log('Goodbye!');
-        } else if (answers.translation.toLowerCase() === '\\a') {
-          await addWord();
-        } else if (answers.translation.toLowerCase() === word.word.toLowerCase()) {
+        } else if (answers.sentenceTranslation.toLowerCase() === '\\a') {
+          await addSentence();
+        } else if (answers.sentenceTranslation.toLowerCase() === word.sentence.toLowerCase()) {
           console.log(chalk.green('✅ Correct!'));
           word.index = Math.max(word.index - 1, -1);
           word.reviewedDate = new Date().toISOString();
         } else {
-          console.log(chalk.blue(`💭 Incorrect. The correct translation is: ${chalk.white(word.word)}`));
-          const answers2 = await promptSentenceTranslation(word.discoveredSentenceTranslation);
+          console.log(chalk.blue(`💭 Incorrect. The correct translation is: ${chalk.white(word.sentence)}`));
+          const answers2 = await promptTranslation(word.wordTranslation);
 
-          if (answers2.sentenceTranslation.toLowerCase() === word.discoveredSentence.toLowerCase()) {
+          if (answers2.translation.toLowerCase() === word.word.toLowerCase()) {
             console.log(chalk.green('✅ Correct!'));
           } else {
-            console.log(chalk.blue(`💭 Incorrect. The correct translation is: ${chalk.white(word.discoveredSentence)}`));
+            console.log(chalk.blue(`💭 Incorrect. The correct translation is: ${chalk.white(word.word)}`));
+            word.index++;
           }
 
-          const answers3 = await promptSentenceTranslation(word.inventedSentenceTranslation);
-
-          if (answers3.sentenceTranslation.toLowerCase() === word.inventedSentence.toLowerCase()) {
-            console.log(chalk.green('✅ Correct!'));
-          } else {
-            console.log(chalk.blue(`💭 Incorrect. The correct translation is: ${chalk.white(word.inventedSentence)}`));
-          }
-
-          word.index++;
           word.reviewedDate = new Date().toISOString();
         }
 
         const fileData = await readJson();
         const json = fileData ? fileData : [];
-        const wordIndex = json.findIndex(w => w.word === word.word);
+        const wordIndex = json.findIndex(w => w.sentence === word.sentence);
         if (wordIndex !== -1) {
           json[wordIndex] = word;
         }
@@ -104,7 +94,7 @@ const reviewWords = async () => {
         await reviewNextWord();
       } else {
         console.log('Review completed.');
-        await addWord();
+        await addSentence();
       }
     };
 
@@ -112,4 +102,4 @@ const reviewWords = async () => {
   }
 };
 
-addWord(); // Initial call to start the loop
+addSentence(); // Initial call to start the loop
