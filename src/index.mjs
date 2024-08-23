@@ -24,7 +24,10 @@ const addWord = async () => {
       discoveredSentence: answers2.discoveredSentence,
       discoveredSentenceTranslation: discoveredSentenceTranslation,
       inventedSentence: answers2.inventedSentence,
-      inventedSentenceTranslation: inventedSentenceTranslation
+      inventedSentenceTranslation: inventedSentenceTranslation,
+      index: 0,
+      creationDate: new Date().toISOString(),
+      reviewedDate: new Date().toISOString()
     };
 
     const fileData = await readJson('words.json');
@@ -43,7 +46,17 @@ const reviewWords = async () => {
     console.log('No words to review.');
     await addWord();
   } else {
-    const words = fileData;
+    const words = fileData.map(word => {
+      const oneMonthAgo = new Date();
+      oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+      if (word.index === -1 && new Date(word.reviewedDate) < oneMonthAgo) {
+        word.index = 0;
+      }
+      return word;
+    });
+
+    words.sort((a, b) => b.index - a.index);
+
     let index = 0;
 
     const reviewNextWord = async () => {
@@ -53,11 +66,12 @@ const reviewWords = async () => {
 
         if (answers.translation.toLowerCase() === '\\q') {
           console.log('Goodbye!');
-          closeFile('words.json');
         } else if (answers.translation.toLowerCase() === '\\a') {
           await addWord();
         } else if (answers.translation.toLowerCase() === word.word.toLowerCase()) {
           console.log(chalk.green('✅ Correct!'));
+          word.index = Math.max(word.index - 1, -1);
+          word.reviewedDate = new Date().toISOString();
           index++;
           await reviewNextWord();
         } else {
@@ -78,10 +92,13 @@ const reviewWords = async () => {
             console.log(chalk.blue(`💭 Incorrect. The correct translation is: ${chalk.white(word.inventedSentence)}`));
           }
 
+          word.index++;
+          word.reviewedDate = new Date().toISOString();
           index++;
           await reviewNextWord();
         }
       } else {
+        await writeJson('words.json', words);
         console.log('Review completed.');
         await addWord();
       }
