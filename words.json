@@ -22,5 +22,13 @@
     "discoveredSentenceTranslation": "Il s'agit d'une véritable révolution.",
     "inventedSentence": "This is akin to a major corporation.",
     "inventedSentenceTranslation": "Cela s'apparente à une grande entreprise."
+  },
+  {
+    "word": "Hi",
+    "translation": "Bonjour",
+    "discoveredSentence": "Hi Marie!",
+    "discoveredSentenceTranslation": "Bonjour Marie !",
+    "inventedSentence": "Hi!",
+    "inventedSentenceTranslation": "Bonjour !"
   }
 ]
