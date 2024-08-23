@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import chalk from 'chalk';
 import { readJson, writeJson } from './file.mjs';
 import { promptNewWord, promptSentences, promptSentenceTranslation, promptTranslation } from './prompts.mjs';
