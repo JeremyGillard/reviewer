@@ -32,18 +32,18 @@ const addWord = async () => {
       reviewedDate: new Date().toISOString()
     };
 
-    const fileData = await readJson('words.json');
+    const fileData = await readJson();
     const json = fileData ? fileData : [];
     json.push(data);
 
-    await writeJson('words.json', json);
+    await writeJson(json);
     console.log('Data saved to words.json');
     addWord(); // Call the function again to ask another question
   }
 };
 
 const reviewWords = async () => {
-  const fileData = await readJson('words.json');
+  const fileData = await readJson();
   if (!fileData) {
     console.log('No words to review.');
     await addWord();
@@ -92,14 +92,14 @@ const reviewWords = async () => {
           word.reviewedDate = new Date().toISOString();
         }
 
-        const fileData = await readJson('words.json');
+        const fileData = await readJson();
         const json = fileData ? fileData : [];
         const wordIndex = json.findIndex(w => w.word === word.word);
         if (wordIndex !== -1) {
           json[wordIndex] = word;
         }
 
-        await writeJson('words.json', json);
+        await writeJson(json);
         index++;
         await reviewNextWord();
       } else {
