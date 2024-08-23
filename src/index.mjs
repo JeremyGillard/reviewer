@@ -1,11 +1,20 @@
-import readline from 'node:readline';
+import inquirer from 'inquirer';
 
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout,
-});
+const askWord = () => {
+  inquirer.prompt([
+    {
+      type: 'input',
+      name: 'englishWord',
+      message: 'New word (or type \\q to quit):',
+    },
+  ]).then(answers => {
+    if (answers.englishWord.toLowerCase() !== '\\q') {
+      console.log(`You entered: ${answers.englishWord}`);
+      askWord(); // Call the function again to ask another question
+    } else {
+      console.log('Goodbye!');
+    }
+  });
+};
 
-rl.question(`What's your name? `, name => {
-  console.log(`Hi ${name}!`);
-  rl.close();
-});
+askWord(); // Initial call to start the loop
