@@ -126,11 +126,11 @@ const reviewWords = () => {
             } else if (answers.translation.toLowerCase() === '\\a') {
               addWord();
             } else if (answers.translation.toLowerCase() === word.word.toLowerCase()) {
-              console.log('Correct! 👍');
+              console.log('✅ Correct!');
               index++;
               reviewNextWord();
             } else {
-              console.log(`Incorrect. The correct translation is: ${word.word}`);
+              console.log(`💭 Incorrect. The correct translation is: ${word.word}`);
               inquirer.prompt([
                 {
                   type: 'input',
@@ -144,14 +144,14 @@ const reviewWords = () => {
                 }
               ]).then(answers2 => {
                 if (answers2.discoveredSentenceTranslation.toLowerCase() === word.discoveredSentence.toLowerCase()) {
-                  console.log('Correct! 👍');
+                  console.log('✅ Correct!');
                 } else {
-                  console.log(`Incorrect. The correct translation is: ${word.discoveredSentence}`);
+                  console.log(`💭 Incorrect. The correct translation is: ${word.discoveredSentence}`);
                 }
                 if (answers2.inventedSentenceTranslation.toLowerCase() === word.inventedSentence.toLowerCase()) {
-                  console.log('Correct! 👍');
+                  console.log('✅ Correct!');
                 } else {
-                  console.log(`Incorrect. The correct translation is: ${word.inventedSentence}`);
+                  console.log(`💭 Incorrect. The correct translation is: ${word.inventedSentence}`);
                 }
                 index++;
                 reviewNextWord();
