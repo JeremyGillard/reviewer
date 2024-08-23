@@ -10,7 +10,7 @@ dotenv.config();
 
 // Define the schema for environment variables
 const envSchema = z.object({
-  DEEPL_API_KEY: z.string().nonempty('DEEPL_API_KEY is required')
+  DEEPL_API_KEY: z.string().min(1, 'DEEPL_API_KEY is required')
 });
 
 // Parse and validate the environment variables
@@ -37,72 +37,72 @@ const translateText = async (text) => {
   }
 };
 
-const addWord = () => {
-  inquirer.prompt([
+const addWord = async () => {
+  const answers = await inquirer.prompt([
     {
       type: 'input',
       name: 'englishWord',
       message: 'New word (or type \\q to quit, \\r to review):',
     }
-  ]).then(async answers => {
-    if (answers.englishWord.toLowerCase() === '\\q') {
-      console.log('Goodbye!');
-      // Close the file properly
-      fs.closeSync(fs.openSync('words.json', 'r'));
-    } else if (answers.englishWord.toLowerCase() === '\\r') {
-      reviewWords();
-    } else {
-      const wordTranslation = await translateText(answers.englishWord);
-      console.log(`Translation: ${wordTranslation}`);
+  ]);
 
-      inquirer.prompt([
-        {
-          type: 'input',
-          name: 'discoveredSentence',
-          message: 'Sentence where the word was discovered:',
-        },
-        {
-          type: 'input',
-          name: 'inventedSentence',
-          message: 'Invent a sentence with this word:',
-        }
-      ]).then(async answers2 => {
-        const discoveredSentenceTranslation = await translateText(answers2.discoveredSentence);
-        const inventedSentenceTranslation = await translateText(answers2.inventedSentence);
+  if (answers.englishWord.toLowerCase() === '\\q') {
+    console.log('Goodbye!');
+    // Close the file properly
+    fs.closeSync(fs.openSync('words.json', 'r'));
+  } else if (answers.englishWord.toLowerCase() === '\\r') {
+    await reviewWords();
+  } else {
+    const wordTranslation = await translateText(answers.englishWord);
+    console.log(`Translation: ${chalk.yellow(wordTranslation)}`);
 
-        const data = {
-          word: answers.englishWord,
-          translation: wordTranslation,
-          discoveredSentence: answers2.discoveredSentence,
-          discoveredSentenceTranslation: discoveredSentenceTranslation,
-          inventedSentence: answers2.inventedSentence,
-          inventedSentenceTranslation: inventedSentenceTranslation
-        };
+    const answers2 = await inquirer.prompt([
+      {
+        type: 'input',
+        name: 'discoveredSentence',
+        message: 'Sentence where the word was discovered:',
+      },
+      {
+        type: 'input',
+        name: 'inventedSentence',
+        message: 'Invent a sentence with this word:',
+      }
+    ]);
 
-        // Append the data to a JSON file
-        fs.readFile('words.json', (err, fileData) => {
-          if (err && err.code !== 'ENOENT') throw err;
+    const discoveredSentenceTranslation = await translateText(answers2.discoveredSentence);
+    const inventedSentenceTranslation = await translateText(answers2.inventedSentence);
 
-          const json = fileData ? JSON.parse(fileData) : [];
-          json.push(data);
+    const data = {
+      word: answers.englishWord,
+      translation: wordTranslation,
+      discoveredSentence: answers2.discoveredSentence,
+      discoveredSentenceTranslation: discoveredSentenceTranslation,
+      inventedSentence: answers2.inventedSentence,
+      inventedSentenceTranslation: inventedSentenceTranslation
+    };
 
-          fs.writeFile('words.json', JSON.stringify(json, null, 2), (err) => {
-            if (err) throw err;
-            console.log('Data saved to words.json');
-            addWord(); // Call the function again to ask another question
-          });
-        });
+    // Append the data to a JSON file
+    fs.readFile('words.json', (err, fileData) => {
+      if (err && err.code !== 'ENOENT') throw err;
+
+      const json = fileData ? JSON.parse(fileData) : [];
+      json.push(data);
+
+      fs.writeFile('words.json', JSON.stringify(json, null, 2), (err) => {
+        if (err) throw err;
+        console.log('Data saved to words.json');
+        addWord(); // Call the function again to ask another question
       });
-    }
-  });
+    });
+  }
 };
 
-const reviewWords = () => {
-  fs.readFile('words.json', (err, fileData) => {
+const reviewWords = async () => {
+  fs.readFile('words.json', async (err, fileData) => {
     if (err) {
       if (err.code === 'ENOENT') {
         console.log('No words to review.');
-        addWord();
+        await addWord();
       } else {
         throw err;
       }
@@ -110,65 +110,67 @@ const reviewWords = () => {
       const words = JSON.parse(fileData);
       let index = 0;
 
-      const reviewNextWord = () => {
+      const reviewNextWord = async () => {
         if (index < words.length) {
           const word = words[index];
-          inquirer.prompt([
+          const answers = await inquirer.prompt([
             {
               type: 'input',
               name: 'translation',
-              message: `Translate this word to English: ${word.translation} (or type \\q to quit, \\a to add new words):`,
+              message: `Translate this word to English: ${chalk.yellow(word.translation)} (or type \\q to quit, \\a to add new words):`,
             }
-          ]).then(answers => {
-            if (answers.translation.toLowerCase() === '\\q') {
-              console.log('Goodbye!');
-              // Close the file properly
-              fs.closeSync(fs.openSync('words.json', 'r'));
-            } else if (answers.translation.toLowerCase() === '\\a') {
-              addWord();
-            } else if (answers.translation.toLowerCase() === word.word.toLowerCase()) {
+          ]);
+
+          if (answers.translation.toLowerCase() === '\\q') {
+            console.log('Goodbye!');
+            // Close the file properly
+            fs.closeSync(fs.openSync('words.json', 'r'));
+          } else if (answers.translation.toLowerCase() === '\\a') {
+            await addWord();
+          } else if (answers.translation.toLowerCase() === word.word.toLowerCase()) {
+            console.log(chalk.green('✅ Correct!'));
+            index++;
+            await reviewNextWord();
+          } else {
+            console.log(chalk.blue(`💭 Incorrect. The correct translation is: ${chalk.white(word.word)}`));
+            const answers2 = await inquirer.prompt([
+              {
+                type: 'input',
+                name: 'discoveredSentenceTranslation',
+                message: `Translate this sentence to English: ${chalk.yellow(word.discoveredSentenceTranslation)}`,
+              }
+            ]);
+
+            if (answers2.discoveredSentenceTranslation.toLowerCase() === word.discoveredSentence.toLowerCase()) {
               console.log(chalk.green('✅ Correct!'));
-              index++;
-              reviewNextWord();
             } else {
-              console.log(chalk.blue(`💭 Incorrect. The correct translation is: `), word.word);
-              inquirer.prompt([
-                {
-                  type: 'input',
-                  name: 'discoveredSentenceTranslation',
-                  message: `Translate this sentence to English: ${word.discoveredSentenceTranslation}`,
-                }
-              ]).then(answers2 => {
-                if (answers2.discoveredSentenceTranslation.toLowerCase() === word.discoveredSentence.toLowerCase()) {
-                  console.log(chalk.green('✅ Correct!'));
-                } else {
-                  console.log(chalk.blue(`💭 Incorrect. The correct translation is: `), word.discoveredSentence);
-                }
-                inquirer.prompt([
-                  {
-                    type: 'input',
-                    name: 'inventedSentenceTranslation',
-                    message: `Translate this sentence to English: ${word.inventedSentenceTranslation}`,
-                  }
-                ]).then(answers3 => {
-                  if (answers3.inventedSentenceTranslation.toLowerCase() === word.inventedSentence.toLowerCase()) {
-                    console.log(chalk.green('✅ Correct!'));
-                  } else {
-                    console.log(chalk.blue(`💭 Incorrect. The correct translation is: `), word.inventedSentence);
-                  }
-                  index++;
-                  reviewNextWord();
-                });
-              });
+              console.log(chalk.blue(`💭 Incorrect. The correct translation is: ${chalk.white(word.discoveredSentence)}`));
             }
-          });
+
+            const answers3 = await inquirer.prompt([
+              {
+                type: 'input',
+                name: 'inventedSentenceTranslation',
+                message: `Translate this sentence to English: ${chalk.yellow(word.inventedSentenceTranslation)}`,
+              }
+            ]);
+
+            if (answers3.inventedSentenceTranslation.toLowerCase() === word.inventedSentence.toLowerCase()) {
+              console.log(chalk.green('✅ Correct!'));
+            } else {
+              console.log(chalk.blue(`💭 Incorrect. The correct translation is: ${chalk.white(word.inventedSentence)}`));
+            }
+
+            index++;
+            await reviewNextWord();
+          }
         } else {
           console.log('Review completed.');
-          addWord();
+          await addWord();
         }
       };
 
-      reviewNextWord();
+      await reviewNextWord();
     }
   });
 };
