@@ -46,14 +46,10 @@ const reviewWords = async () => {
     console.log('No words to review.');
     await addWord();
   } else {
-    const words = fileData.map(word => {
-      const oneMonthAgo = new Date();
-      oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
-      if (word.index === -1 && new Date(word.reviewedDate) < oneMonthAgo) {
-        word.index = 0;
-      }
-      return word;
-    });
+    const oneMonthAgo = new Date();
+    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+
+    const words = fileData.filter(word => word.index !== -1 || new Date(word.reviewedDate) < oneMonthAgo);
 
     words.sort((a, b) => b.index - a.index);
 
@@ -72,8 +68,6 @@ const reviewWords = async () => {
           console.log(chalk.green('✅ Correct!'));
           word.index = Math.max(word.index - 1, -1);
           word.reviewedDate = new Date().toISOString();
-          index++;
-          await reviewNextWord();
         } else {
           console.log(chalk.blue(`💭 Incorrect. The correct translation is: ${chalk.white(word.word)}`));
           const answers2 = await promptSentenceTranslation(word.discoveredSentenceTranslation);
@@ -94,11 +88,19 @@ const reviewWords = async () => {
 
           word.index++;
           word.reviewedDate = new Date().toISOString();
-          index++;
-          await reviewNextWord();
         }
+
+        const fileData = await readJson('words.json');
+        const json = fileData ? fileData : [];
+        const wordIndex = json.findIndex(w => w.word === word.word);
+        if (wordIndex !== -1) {
+          json[wordIndex] = word;
+        }
+
+        await writeJson('words.json', json);
+        index++;
+        await reviewNextWord();
       } else {
-        await writeJson('words.json', words);
         console.log('Review completed.');
         await addWord();
       }
