@@ -116,11 +116,17 @@ const reviewWords = () => {
             {
               type: 'input',
               name: 'translation',
-              message: `Translate this word to English: ${word.translation}`,
+              message: `Translate this word to English: ${word.translation} (or type \\q to quit, \\a to add new words):`,
             }
           ]).then(answers => {
-            if (answers.translation.toLowerCase() === word.word.toLowerCase()) {
-              console.log('Correct!');
+            if (answers.translation.toLowerCase() === '\\q') {
+              console.log('Goodbye!');
+              // Close the file properly
+              fs.closeSync(fs.openSync('words.json', 'r'));
+            } else if (answers.translation.toLowerCase() === '\\a') {
+              addWord();
+            } else if (answers.translation.toLowerCase() === word.word.toLowerCase()) {
+              console.log('Correct! 👍');
               index++;
               reviewNextWord();
             } else {
@@ -138,12 +144,12 @@ const reviewWords = () => {
                 }
               ]).then(answers2 => {
                 if (answers2.discoveredSentenceTranslation.toLowerCase() === word.discoveredSentence.toLowerCase()) {
-                  console.log('Correct!');
+                  console.log('Correct! 👍');
                 } else {
                   console.log(`Incorrect. The correct translation is: ${word.discoveredSentence}`);
                 }
                 if (answers2.inventedSentenceTranslation.toLowerCase() === word.inventedSentence.toLowerCase()) {
-                  console.log('Correct!');
+                  console.log('Correct! 👍');
                 } else {
                   console.log(`Incorrect. The correct translation is: ${word.inventedSentence}`);
                 }
